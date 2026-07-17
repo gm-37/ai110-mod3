@@ -24,9 +24,11 @@ class UserProfile:
     Represents a user's taste preferences.
     Required by tests/test_recommender.py
     """
-    favorite_genre: str
-    favorite_mood: str
+    favorite_genres: List[str]
+    favorite_moods: List[str]
     target_energy: float
+    target_valence: float
+    target_danceability: float
     likes_acoustic: bool
 
 class Recommender:
@@ -71,12 +73,49 @@ def load_songs(csv_path: str) -> List[Dict]:
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     """
-    Scores a single song against user preferences.
+    Scores a single song against user preferences using the recipe in README.md.
+    Returns (score, reasons), where reasons explains what earned points.
     Required by recommend_songs() and src/main.py
     """
-    # TODO: Implement scoring logic using your Algorithm Recipe from Phase 2.
-    # Expected return format: (score, reasons)
-    return []
+    score = 0.0
+    reasons: List[str] = []
+
+    # Categorical signals: full points if the song is in the favorites list.
+    # No bonus for extra matches, so broad taste can't inflate every score.
+    if song["genre"] in user_prefs.get("favorite_genres", []):
+        score += 2.0
+        reasons.append(f"genre match ({song['genre']}) +2.0")
+
+    if song["mood"] in user_prefs.get("favorite_moods", []):
+        score += 1.0
+        reasons.append(f"mood match ({song['mood']}) +1.0")
+
+    # Numeric signals: the closer to the target, the more points.
+    # points = max_points * (1 - distance), all values are on a 0-1 scale.
+    numeric_signals = [
+        ("energy", "energy", 1.0),
+        ("valence", "valence", 0.5),
+        ("danceability", "danceability", 0.5),
+    ]
+    for field, pref_key, max_points in numeric_signals:
+        target = user_prefs.get(pref_key)
+        if target is None:
+            continue
+        points = max_points * (1 - abs(song[field] - target))
+        score += points
+        reasons.append(f"{field} close to target +{points:.2f}")
+
+    # Acoustic preference: a song is "acoustic" if more than 50% acoustic.
+    # Award points when that matches what the user likes (or doesn't like).
+    likes_acoustic = user_prefs.get("likes_acoustic")
+    if likes_acoustic is not None:
+        song_is_acoustic = song["acousticness"] > 0.5
+        if song_is_acoustic == likes_acoustic:
+            score += 0.5
+            label = "acoustic" if likes_acoustic else "non-acoustic"
+            reasons.append(f"{label} match +0.5")
+
+    return score, reasons
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
     """
