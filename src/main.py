@@ -16,7 +16,7 @@ def main() -> None:
     songs = load_songs("data/songs.csv") 
 
     # Starter example profile
-    user_prefs = {
+    user_prefs1 = {
         "favorite_genres": ["pop"],
         "favorite_moods": ["happy"],
         "target_energy": 0.8,
@@ -25,7 +25,25 @@ def main() -> None:
         "likes_acoustic": False,
     }
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    user_prefs2 = {
+        "favorite_genres": ["lofi"],
+        "favorite_moods": ["chill"],
+        "target_energy": 0.5,
+        "target_valence": 0.5,
+        "target_danceability": 0.3,
+        "likes_acoustic": True,
+    }
+
+    user_prefs3 = {
+        "favorite_genres": ["rock"],
+        "favorite_moods": ["intense"],
+        "target_energy": 0.8,
+        "target_valence": 0.7,
+        "target_danceability": 0.7,
+        "likes_acoustic": True,
+    }
+
+    recommendations = recommend_songs(user_prefs1, songs, k=5)
 
     print()
     print("=" * 44)
