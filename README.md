@@ -29,6 +29,9 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+
+Real-world recommendations work through a ranking system: they predict how likely you are to engage with a candidate item based on your previous behavior, then show you the highest-scoring ones according to criteria, like implicit signals (skips, watch time, replays) and explicit ratings on a lower scale. They use collaborative (user-based) and content (match) filtering to narrow billions of items down to a few hundred and rank those precisely. My version of the recommender will prioritize the signals the UserProfile indicates (genre first, then mood and energy-closeness, and then acoustic preference). Songs closer to the target energy will be rewarded and the weights in this order will be prioritized (explainability above all).
+
 ---
 
 ## Getting Started
