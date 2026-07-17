@@ -93,9 +93,9 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     # Numeric signals: the closer to the target, the more points.
     # points = max_points * (1 - distance), all values are on a 0-1 scale.
     numeric_signals = [
-        ("energy", "energy", 1.0),
-        ("valence", "valence", 0.5),
-        ("danceability", "danceability", 0.5),
+        ("energy", "target_energy", 1.0),
+        ("valence", "target_valence", 0.5),
+        ("danceability", "target_danceability", 0.5),
     ]
     for field, pref_key, max_points in numeric_signals:
         target = user_prefs.get(pref_key)
