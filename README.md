@@ -32,6 +32,26 @@ You can include a simple diagram or bullet list if helpful.
 
 Real-world recommendations work through a ranking system: they predict how likely you are to engage with a candidate item based on your previous behavior, then show you the highest-scoring ones according to criteria, like implicit signals (skips, watch time, replays) and explicit ratings on a lower scale. They use collaborative (user-based) and content (match) filtering to narrow billions of items down to a few hundred and rank those precisely. My version of the recommender will prioritize the signals the UserProfile indicates (genre first, then mood and energy-closeness, and then acoustic preference). Songs closer to the target energy will be rewarded and the weights in this order will be prioritized (explainability above all).
 
+Plan:
+
+The score for each song is a weighted sum of six signals/categories. Genre is the strongest, and genre+mood outweighs the other signals (energy-esque)
+
+| Signal | Rule | Points |
+| --- | --- | --- |
+| Genre | `song.genre` in `favorite_genres` | +2 (flat) |
+| Mood | `song.mood` in `favorite_moods` | +1 (flat) |
+| Energy | closeness to `target_energy` | up to +1.0 |
+| Valence | closeness to `target_valence` | up to +0.5 |
+| Danceability | closeness to `target_danceability` | up to +0.5 |
+| Acousticness | closeness to `target_acousticness` | up to +0.5 |
+
+Max score ≈ **5.5** (categorical 3.0 + numeric 2.5).
+
+- **Categorical signals (genre, mood)** award full points on a list membership match — no bonus for multiple matches, so a broad-taste profile can't inflate every score.
+- **Numeric signals** use a closeness formula: `points = MAX_VALUE * (1 - abs(song.value - target))`. All fields are 0–1. Energy is weighted double the other numeric axes.
+
+Possible bias: this system may over-prioritize genre, so mood will be secondary. Valence may match energy a lot so could affect recommendations being too "mono". Danceability may also be correlated similarly.
+
 ---
 
 ## Getting Started
