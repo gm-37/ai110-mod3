@@ -101,6 +101,10 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
         target = user_prefs.get(pref_key)
         if target is None:
             continue
+        # All values live on a 0-1 scale. Clamp the target into range so an
+        # out-of-range preference (e.g. 5.0 or -3.0) can't drive points
+        # negative and invert the ranking.
+        target = min(1.0, max(0.0, target))
         points = max_points * (1 - abs(song[field] - target))
         score += points
         reasons.append(f"{field} close to target +{points:.2f}")

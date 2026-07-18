@@ -91,15 +91,300 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
+Captured from `python -m src.main`. The first three are realistic listeners;
+the last three are adversarial profiles designed to stress the scoring logic.
 
+**USER 1 (pop / happy)**
 ```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
+1. Sunrise City — Neon Echo
+   Score: 5.37
+   Why:
+     • genre match (pop) +2.0
+     • mood match (happy) +1.0
+     • energy close to target +0.98
+     • valence close to target +0.43
+     • danceability close to target +0.45
+     • non-acoustic match +0.5
+
+2. Gym Hero — Max Pulse
+   Score: 4.25
+   Why:
+     • genre match (pop) +2.0
+     • energy close to target +0.87
+     • valence close to target +0.46
+     • danceability close to target +0.41
+     • non-acoustic match +0.5
+
+3. Rooftop Lights — Indigo Parade
+   Score: 3.34
+   Why:
+     • mood match (happy) +1.0
+     • energy close to target +0.96
+     • valence close to target +0.44
+     • danceability close to target +0.44
+     • non-acoustic match +0.5
+
+4. Concrete Verses — MC Grid
+   Score: 2.37
+   Why:
+     • energy close to target +0.98
+     • valence close to target +0.46
+     • danceability close to target +0.42
+     • non-acoustic match +0.5
+
+5. Deep Ascent — Tidal Frame
+   Score: 2.34
+   Why:
+     • energy close to target +0.94
+     • valence close to target +0.49
+     • danceability close to target +0.40
+     • non-acoustic match +0.5
+```
+
+**USER 2 (lofi / chill)**
+```
+1. Midnight Coding — LoRoom
+   Score: 5.23
+   Why:
+     • genre match (lofi) +2.0
+     • mood match (chill) +1.0
+     • energy close to target +0.92
+     • valence close to target +0.47
+     • danceability close to target +0.34
+     • acoustic match +0.5
+
+2. Library Rain — Paper Lanterns
+   Score: 5.16
+   Why:
+     • genre match (lofi) +2.0
+     • mood match (chill) +1.0
+     • energy close to target +0.85
+     • valence close to target +0.45
+     • danceability close to target +0.36
+     • acoustic match +0.5
+
+3. Focus Flow — LoRoom
+   Score: 4.21
+   Why:
+     • genre match (lofi) +2.0
+     • energy close to target +0.90
+     • valence close to target +0.46
+     • danceability close to target +0.35
+     • acoustic match +0.5
+
+4. Spacewalk Thoughts — Orbit Bloom
+   Score: 3.15
+   Why:
+     • mood match (chill) +1.0
+     • energy close to target +0.78
+     • valence close to target +0.42
+     • danceability close to target +0.45
+     • acoustic match +0.5
+
+5. Dusty Backroads — Hollis Grange
+   Score: 2.29
+   Why:
+     • energy close to target +0.99
+     • valence close to target +0.46
+     • danceability close to target +0.33
+     • acoustic match +0.5
+```
+
+**USER 3 (rock / intense)**
+```
+1. Storm Runner — Voltline
+   Score: 4.76
+   Why:
+     • genre match (rock) +2.0
+     • mood match (intense) +1.0
+     • energy close to target +0.89
+     • valence close to target +0.39
+     • danceability close to target +0.48
+
+2. Gym Hero — Max Pulse
+   Score: 2.75
+   Why:
+     • mood match (intense) +1.0
+     • energy close to target +0.87
+     • valence close to target +0.46
+     • danceability close to target +0.41
+
+3. Velvet Whispers — Aria Sol
+   Score: 2.15
+   Why:
+     • energy close to target +0.66
+     • valence close to target +0.49
+     • danceability close to target +0.50
+     • acoustic match +0.5
+
+4. Dusty Backroads — Hollis Grange
+   Score: 2.12
+   Why:
+     • energy close to target +0.71
+     • valence close to target +0.44
+     • danceability close to target +0.47
+     • acoustic match +0.5
+
+5. Wildflower Trail — The Hearth
+   Score: 2.05
+   Why:
+     • energy close to target +0.64
+     • valence close to target +0.48
+     • danceability close to target +0.43
+     • acoustic match +0.5
+```
+
+**ADVERSARIAL: out-of-range targets** — `target_energy=5.0`, `target_valence=-3.0`.
+`score_song` now clamps targets into the 0–1 range, so 5.0 → 1.0 and -3.0 → 0.0.
+Scores stay positive and the ranking behaves sanely (favoring high-energy,
+low-valence songs) instead of inverting. *(Before the clamp fix, every score
+went negative and the ranking flipped into "least-penalized" order.)*
+```
+1. Sunrise City — Neon Echo
+   Score: 4.85
+   Why:
+     • genre match (pop) +2.0
+     • mood match (happy) +1.0
+     • energy close to target +0.82
+     • valence close to target +0.08
+     • danceability close to target +0.45
+     • non-acoustic match +0.5
+
+2. Gym Hero — Max Pulse
+   Score: 3.96
+   Why:
+     • genre match (pop) +2.0
+     • energy close to target +0.93
+     • valence close to target +0.11
+     • danceability close to target +0.41
+     • non-acoustic match +0.5
+
+3. Rooftop Lights — Indigo Parade
+   Score: 2.79
+   Why:
+     • mood match (happy) +1.0
+     • energy close to target +0.76
+     • valence close to target +0.09
+     • danceability close to target +0.44
+     • non-acoustic match +0.5
+
+4. Iron Requiem — Blackforge
+   Score: 2.25
+   Why:
+     • energy close to target +0.97
+     • valence close to target +0.36
+     • danceability close to target +0.43
+     • non-acoustic match +0.5
+
+5. Storm Runner — Voltline
+   Score: 2.15
+   Why:
+     • energy close to target +0.91
+     • valence close to target +0.26
+     • danceability close to target +0.48
+     • non-acoustic match +0.5
+```
+
+**ADVERSARIAL: contradiction** — asks for angry metal categorically, but the
+numeric targets describe a calm/happy/danceable song. The flat +2/+1 bonuses win:
+`Iron Requiem` tops the list despite failing every numeric target.
+```
+1. Iron Requiem — Blackforge
+   Score: 4.14
+   Why:
+     • genre match (metal) +2.0
+     • mood match (angry) +1.0
+     • energy close to target +0.13
+     • valence close to target +0.19
+     • danceability close to target +0.33
+     • non-acoustic match +0.5
+
+2. Island Time — Sunny Roots
+   Score: 1.94
+   Why:
+     • energy close to target +0.55
+     • valence close to target +0.46
+     • danceability close to target +0.43
+     • non-acoustic match +0.5
+
+3. Rooftop Lights — Indigo Parade
+   Score: 1.75
+   Why:
+     • energy close to target +0.34
+     • valence close to target +0.46
+     • danceability close to target +0.46
+     • non-acoustic match +0.5
+
+4. Sunrise City — Neon Echo
+   Score: 1.70
+   Why:
+     • energy close to target +0.28
+     • valence close to target +0.47
+     • danceability close to target +0.45
+     • non-acoustic match +0.5
+
+5. Concrete Verses — MC Grid
+   Score: 1.65
+   Why:
+     • energy close to target +0.32
+     • valence close to target +0.36
+     • danceability close to target +0.47
+     • non-acoustic match +0.5
+```
+
+**ADVERSARIAL: likes everything** — every genre and mood is a favorite, so the
+categorical bonus stops discriminating and the top 5 collapse into a ~0.1-point
+band decided only by closeness to the 0.5 numeric targets.
+```
+1. Dusty Backroads — Hollis Grange
+   Score: 5.38
+   Why:
+     • genre match (country) +2.0
+     • mood match (nostalgic) +1.0
+     • energy close to target +0.99
+     • valence close to target +0.46
+     • danceability close to target +0.43
+     • acoustic match +0.5
+
+2. Midnight Coding — LoRoom
+   Score: 5.33
+   Why:
+     • genre match (lofi) +2.0
+     • mood match (chill) +1.0
+     • energy close to target +0.92
+     • valence close to target +0.47
+     • danceability close to target +0.44
+     • acoustic match +0.5
+
+3. Focus Flow — LoRoom
+   Score: 5.30
+   Why:
+     • genre match (lofi) +2.0
+     • mood match (focused) +1.0
+     • energy close to target +0.90
+     • valence close to target +0.46
+     • danceability close to target +0.45
+     • acoustic match +0.5
+
+4. Wildflower Trail — The Hearth
+   Score: 5.29
+   Why:
+     • genre match (folk) +2.0
+     • mood match (hopeful) +1.0
+     • energy close to target +0.94
+     • valence close to target +0.38
+     • danceability close to target +0.47
+     • acoustic match +0.5
+
+5. Velvet Whispers — Aria Sol
+   Score: 5.27
+   Why:
+     • genre match (r&b) +2.0
+     • mood match (romantic) +1.0
+     • energy close to target +0.96
+     • valence close to target +0.41
+     • danceability close to target +0.40
+     • acoustic match +0.5
 ```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
